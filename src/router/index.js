@@ -15,49 +15,52 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/index',
-      name: 'index',
-      component: Indexview
-    },
-    {
-      path: '/clazz',
-      name: 'clazz',
-      component: Clazzview
-    },
-    {
-      path: '/dept',
-      name: 'dept',
-      component: Deptview
-    },
-    {
-      path: '/emp',
-      name: 'emp',
-      component: EmpView
-    },
-    {
-      path: '/log',
-      name: 'log',
-      component: Logview
-    },
-    {
-      path: '/stu',
-      name: 'stu',
-      component: Stuview
-    },
-    {
-      path: '/empReport',
-      name: 'empReport',
-      component: EmpReportView
-    },
-    {
-      path: '/stuReport',
-      name: 'stuReport',
-      component: stuReportview
-    },
-    {
-      path: '/layout',
-      name: 'layout',
-      component: LayoutView
+      path: '/',
+      name: '',
+      component: LayoutView,
+      redirect: '/index',
+      children: [
+        {
+          path: 'index',
+          name: 'index',
+          component: Indexview
+        },
+        {
+          path: 'clazz',
+          name: 'clazz',
+          component: Clazzview
+        },
+        {
+          path: 'dept',
+          name: 'dept',
+          component: Deptview
+        },
+        {
+          path: 'emp',
+          name: 'emp',
+          component: EmpView
+        },
+        {
+          path: 'log',
+          name: 'log',
+          component: Logview
+        },
+        {
+          path: 'stu',
+          name: 'stu',
+          component: Stuview
+        },
+        {
+          path: 'empReport',
+          name: 'empReport',
+          component: EmpReportView
+        },
+        {
+          path: 'stuReport',
+          name: 'stuReport',
+          component: stuReportview
+        },
+      ]
     },
     {
       path: '/login',
