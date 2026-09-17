@@ -99,7 +99,9 @@
         </el-aside>
 
         <el-main>
-          右侧核心展示区域
+          <router-view>
+
+          </router-view>
         </el-main>
       </el-container>
 

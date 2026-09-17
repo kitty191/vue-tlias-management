@@ -45,12 +45,12 @@ const router = createRouter({
       component: Stuview
     },
     {
-      path: '/report/emp',
+      path: '/empReport',
       name: 'empReport',
       component: EmpReportView
     },
     {
-      path: '/report/stu',
+      path: '/stuReport',
       name: 'stuReport',
       component: stuReportview
     },
