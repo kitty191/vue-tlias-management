@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { queryAllApi, addApi, querybyIdApi } from "../../api/dept";
-import { ElMessage } from "element-plus";
+import { queryAllApi, addApi, querybyIdApi, updateApi, deleteByIdApi } from "../../api/dept";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 const deptList = ref([]);
 // dialog对话框
@@ -28,8 +28,13 @@ const save = async () => {
   //表单校验
   if (!deptFormRef.value) return;
   deptFormRef.value.validate(async (valia) => {
-    if (valia) {
-      const result = await addApi(dept.value);
+    if (valia) {//通过
+      let result;
+      if (dept.value.id) {//修改
+        result = await updateApi(dept.value);
+      } else {//新增
+        result = await addApi(dept.value)
+      }
       if (result.code == 1) {
         //成功
         //提示信息，弹窗
@@ -48,6 +53,7 @@ const save = async () => {
   });
 };
 
+//新增部门
 const addDept = () => {
   dialogFormVisible.value = true;
   formTitle.value = "新增部门";
@@ -81,6 +87,28 @@ const rules = ref({
     { min: 2, max: 10, message: "部门名称长度应在2~10位之间", trigger: "blur" },
   ],
 });
+
+//删除
+const delById = async (id) => {
+  ElMessageBox.confirm(
+    '确认删除吗？',
+    '提示',
+    { confirmButtonText: '确认', cancelButtonText: '取消', type: 'warning' }
+  )
+    .then(async () => {//确认时点击触发
+      const result = await deleteByIdApi(id);
+      if (result.code == 1) {
+        ElMessage.success("删除成功");
+        search();
+      } else {
+        ElMessage.error(result.msg);
+      }
+    })
+    .catch(() => {//取消时点击触发
+      ElMessage.info("您已取消删除")
+    })
+}
+
 </script>
 
 <template>
@@ -100,7 +128,7 @@ const rules = ref({
           <el-button type="primary" size="small" @click="edit(scope.row.id)"><el-icon>
               <EditPen />
             </el-icon>编辑</el-button>
-          <el-button type="danger" size="small"><el-icon>
+          <el-button type="danger" size="small" @click="delById(scope.row.id)"><el-icon>
               <Delete />
             </el-icon>删除</el-button>
         </template>
