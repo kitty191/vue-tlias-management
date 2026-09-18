@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { queryAllApi, addApi } from '../../api/dept';
-import { ElMessage, valueEquals } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 
 const deptList = ref([])
@@ -11,6 +11,7 @@ const formTitle = ref('')
 const dept = ref({
   name: ''
 })
+const deptFormRef = ref();
 
 const search = async () => {
   // const result = await axios.get('https://apifoxmock.com/m1/3128855-1224313-default/depts');
@@ -25,23 +26,36 @@ const search = async () => {
 }
 
 const save = async () => {
-  const result = await addApi(dept.value);
-  if (result.code == 1) {//成功
-    //提示信息，弹窗
-    ElMessage.success('操作成功');
-    // 关闭对话框
-    dialogFormVisible.value = false;
-    //重新查询刷新
-    search();
-  } else {//失败
-    ElMessage.error(result.msg)
-  }
+  //表单校验
+  if (!deptFormRef.value) return;
+  deptFormRef.value.validate(async (valia) => {
+    if (valia) {
+      const result = await addApi(dept.value);
+      if (result.code == 1) {//成功
+        //提示信息，弹窗
+        ElMessage.success('操作成功');
+        // 关闭对话框
+        dialogFormVisible.value = false;
+        //重新查询刷新
+        search();
+      } else {//失败
+        ElMessage.error(result.msg);
+      }
+    } else {
+      ElMessage.error('表单校验不通过');
+    }
+  })
+
+
 }
 
 const addDept = () => {
   dialogFormVisible.value = true;
   formTitle.value = '新增部门';
   dept.value = { name: '' };
+  if (deptFormRef.value) {
+    deptFormRef.value.resetFields();
+  }
 }
 
 onMounted(() => {
@@ -49,6 +63,13 @@ onMounted(() => {
 }
 )
 
+//表单校验
+const rules = ref({
+  name: [
+    { required: true, message: '部门名称是必填项', trigger: 'blur' },
+    { min: 2, max: 10, message: '部门名称长度应在2~10位之间', trigger: 'blur' }
+  ]
+})
 
 </script>
 
@@ -58,6 +79,7 @@ onMounted(() => {
     <el-button type="primary" @click="addDept">+ 新增部门</el-button>
   </div>
 
+  //表格
   <div class="container">
     <el-table :data="deptList" border style="width: 100%">
       <el-table-column type="index" label="序号" width="100" align="center" />
@@ -78,8 +100,8 @@ onMounted(() => {
 
   <!-- dialog对话框 -->
   <el-dialog v-model="dialogFormVisible" :title="formTitle" width="500">
-    <el-form :model="dept">
-      <el-form-item label="部门名称" label-width="80px">
+    <el-form :model="dept" :rules="rules" ref="deptFormRef">
+      <el-form-item label="部门名称" label-width="80px" prop="name">
         <el-input v-model="dept.name" autocomplete="off" />
       </el-form-item>
     </el-form>
