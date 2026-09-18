@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { queryPageApi } from '../../api/emp';
+
 
 //员工列表数据
 const empList = ref([
@@ -45,11 +46,11 @@ const total = ref(0);
 
 //每页条数改变时触发(参数 val 是新的每页条数)
 const handleSizeChange = (val) => {
-    console.log(`每页展示${val}条记录`)
+    search();
 }
 //当前页码改变时触发(参数 val 是新的页码)
 const handleCurrentChange = (val) => {
-    console.log(`当前页码：${val}`)
+    search();
 }
 
 //侦听searchEmp的date属性
@@ -88,8 +89,16 @@ const clear = () => {
         begin: '',
         end: ''
     };
+    currentPage.value = 1;
     search();
 }
+
+//钩子函数
+onMounted(
+    () => {
+        search();
+    }
+)
 </script>
 
 <template>
