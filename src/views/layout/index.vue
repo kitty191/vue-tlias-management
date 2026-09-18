@@ -44,39 +44,57 @@
                 班级学员管理
               </template>
               <el-menu-item index="/clazz">
-                <el-icon> <HomeFilled /> </el-icon>班级管理
+                <el-icon>
+                  <HomeFilled />
+                </el-icon>班级管理
               </el-menu-item>
               <el-menu-item index="/stu">
-                <el-icon> <UserFilled /> </el-icon>学员管理
+                <el-icon>
+                  <UserFilled />
+                </el-icon>学员管理
               </el-menu-item>
             </el-sub-menu>
 
             <!-- 系统信息管理 -->
             <el-sub-menu index="/system">
               <template #title>
-                <el-icon> <Tools /> </el-icon>系统信息管理
+                <el-icon>
+                  <Tools />
+                </el-icon>系统信息管理
               </template>
               <el-menu-item index="/dept">
-                <el-icon> <HelpFilled /> </el-icon>部门管理
+                <el-icon>
+                  <HelpFilled />
+                </el-icon>部门管理
               </el-menu-item>
               <el-menu-item index="/emp">
-                <el-icon> <Avatar /> </el-icon>员工管理
+                <el-icon>
+                  <Avatar />
+                </el-icon>员工管理
               </el-menu-item>
             </el-sub-menu>
 
             <!-- 数据统计管理 -->
             <el-sub-menu index="/report">
               <template #title>
-                <el-icon> <Histogram /> </el-icon>数据统计管理
+                <el-icon>
+                  <Histogram />
+                </el-icon>数据统计管理
               </template>
               <el-menu-item index="/empReport">
-                <el-icon> <InfoFilled /> </el-icon>员工信息统计
+                <el-icon>
+                  <InfoFilled />
+                </el-icon>员工信息统计
               </el-menu-item>
               <el-menu-item index="/stuReport">
-                <el-icon> <Share /> </el-icon>学员信息统计
+                <el-icon>
+                  <Share />
+                </el-icon>学员信息统计
               </el-menu-item>
               <el-menu-item index="/log">
-                <el-icon> <Document /> </el-icon>日志信息统计
+                <el-icon>
+                  <Document />
+                </el-icon>日志信息统计
               </el-menu-item>
             </el-sub-menu>
           </el-menu>
@@ -91,28 +109,34 @@
 </template>
 
 <style scoped>
+.common-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .header {
-  background-image: linear-gradient(
-    to right,
-    #00547d,
-    #007fa4,
-    #00aaa0,
-    #00d072,
-    #a8eb12
-  );
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-image: linear-gradient(to right,
+      #00547d,
+      #007fa4,
+      #00aaa0,
+      #00d072,
+      #a8eb12);
 }
 
 .title {
   color: white;
-  font-size: 40px;
+  font-size: clamp(24px, 3vw, 40px);
   font-family: 楷体;
-  line-height: 60px;
   font-weight: bolder;
+  white-space: nowrap;
 }
 
 .right_tool {
-  float: right;
-  line-height: 60px;
+  white-space: nowrap;
 }
 
 a {
@@ -121,8 +145,6 @@ a {
 }
 
 .aside {
-  width: 220px;
   border-right: 1px solid #ccc;
-  height: 730px;
 }
 </style>
