@@ -1,11 +1,7 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-  <img src="../../assets/index.png">
+  <img src="../../assets/index.png" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

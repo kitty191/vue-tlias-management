@@ -1,11 +1,5 @@
-<script setup>
+<script setup></script>
 
-</script>
+<template>员工管理</template>
 
-<template>
-  员工管理
-</template>
-
-<style scoped>
-
-</style>
+<style scoped></style>

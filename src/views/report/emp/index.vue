@@ -1,11 +1,5 @@
-<script setup>
+<script setup></script>
 
-</script>
+<template>员工信息统计</template>
 
-<template>
-  员工信息统计
-</template>
-
-<style scoped>
-
-</style>
+<style scoped></style>

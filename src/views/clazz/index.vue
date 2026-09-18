@@ -1,11 +1,5 @@
-<script setup>
+<script setup></script>
 
-</script>
+<template>班级管理</template>
 
-<template>
-  班级管理
-</template>
-
-<style scoped>
-
-</style>
+<style scoped></style>

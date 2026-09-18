@@ -1,16 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { queryAllApi, addApi } from '../../api/dept';
-import { ElMessage } from 'element-plus'
+import { ref, onMounted } from "vue";
+import { queryAllApi, addApi } from "../../api/dept";
+import { ElMessage } from "element-plus";
 
-
-const deptList = ref([])
+const deptList = ref([]);
 // dialog对话框
-const dialogFormVisible = ref(false)
-const formTitle = ref('')
+const dialogFormVisible = ref(false);
+const formTitle = ref("");
 const dept = ref({
-  name: ''
-})
+  name: "",
+});
 const deptFormRef = ref();
 
 const search = async () => {
@@ -23,7 +22,7 @@ const search = async () => {
   if (result.code == 1) {
     deptList.value = result.data;
   }
-}
+};
 
 const save = async () => {
   //表单校验
@@ -31,46 +30,44 @@ const save = async () => {
   deptFormRef.value.validate(async (valia) => {
     if (valia) {
       const result = await addApi(dept.value);
-      if (result.code == 1) {//成功
+      if (result.code == 1) {
+        //成功
         //提示信息，弹窗
-        ElMessage.success('操作成功');
+        ElMessage.success("操作成功");
         // 关闭对话框
         dialogFormVisible.value = false;
         //重新查询刷新
         search();
-      } else {//失败
+      } else {
+        //失败
         ElMessage.error(result.msg);
       }
     } else {
-      ElMessage.error('表单校验不通过');
+      ElMessage.error("表单校验不通过");
     }
-  })
-
-
-}
+  });
+};
 
 const addDept = () => {
   dialogFormVisible.value = true;
-  formTitle.value = '新增部门';
-  dept.value = { name: '' };
+  formTitle.value = "新增部门";
+  dept.value = { name: "" };
   if (deptFormRef.value) {
     deptFormRef.value.resetFields();
   }
-}
+};
 
 onMounted(() => {
   search();
-}
-)
+});
 
 //表单校验
 const rules = ref({
   name: [
-    { required: true, message: '部门名称是必填项', trigger: 'blur' },
-    { min: 2, max: 10, message: '部门名称长度应在2~10位之间', trigger: 'blur' }
-  ]
-})
-
+    { required: true, message: "部门名称是必填项", trigger: "blur" },
+    { min: 2, max: 10, message: "部门名称长度应在2~10位之间", trigger: "blur" },
+  ],
+});
 </script>
 
 <template>
@@ -83,16 +80,26 @@ const rules = ref({
   <div class="container">
     <el-table :data="deptList" border style="width: 100%">
       <el-table-column type="index" label="序号" width="100" align="center" />
-      <el-table-column prop="name" label="部门名称" width="260" align="center" />
-      <el-table-column prop="updateTime" label="最后操作时间" width="300" align="center" />
+      <el-table-column
+        prop="name"
+        label="部门名称"
+        width="260"
+        align="center"
+      />
+      <el-table-column
+        prop="updateTime"
+        label="最后操作时间"
+        width="300"
+        align="center"
+      />
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button type="primary" size="small"><el-icon>
-              <EditPen />
-            </el-icon>编辑</el-button>
-          <el-button type="danger" size="small"><el-icon>
-              <Delete />
-            </el-icon>删除</el-button>
+          <el-button type="primary" size="small"
+            ><el-icon> <EditPen /> </el-icon>编辑</el-button
+          >
+          <el-button type="danger" size="small"
+            ><el-icon> <Delete /> </el-icon>删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
