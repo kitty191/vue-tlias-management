@@ -1,13 +1,47 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { queryAllApi, addApi } from '../../api/dept';
+import { ElMessage, valueEquals } from 'element-plus'
 
+
+const deptList = ref([])
+// dialog对话框
+const dialogFormVisible = ref(false)
+const formTitle = ref('')
+const dept = ref({
+  name: ''
+})
 
 const search = async () => {
-  const result = await axios.get('https://apifoxmock.com/m1/3128855-1224313-default/depts');
-  if (result.data.code == 1) {
-    deptList.value = result.data.data;
+  // const result = await axios.get('https://apifoxmock.com/m1/3128855-1224313-default/depts');
+  // if (result.data.code == 1) {
+  //   deptList.value = result.data.data;
+  // }
+
+  const result = await queryAllApi();
+  if (result.code == 1) {
+    deptList.value = result.data;
   }
+}
+
+const save = async () => {
+  const result = await addApi(dept.value);
+  if (result.code == 1) {//成功
+    //提示信息，弹窗
+    ElMessage.success('操作成功');
+    // 关闭对话框
+    dialogFormVisible.value = false;
+    //重新查询刷新
+    search();
+  } else {//失败
+    ElMessage.error(result.msg)
+  }
+}
+
+const addDept = () => {
+  dialogFormVisible.value = true;
+  formTitle.value = '新增部门';
+  dept.value = { name: '' };
 }
 
 onMounted(() => {
@@ -15,13 +49,13 @@ onMounted(() => {
 }
 )
 
-const deptList = ref([])
+
 </script>
 
 <template>
   <h1>部门管理</h1>
   <div class="container">
-    <el-button type="primary">+ 新增部门</el-button>
+    <el-button type="primary" @click="addDept">+ 新增部门</el-button>
   </div>
 
   <div class="container">
@@ -40,8 +74,22 @@ const deptList = ref([])
         </template>
       </el-table-column>
     </el-table>
-
   </div>
+
+  <!-- dialog对话框 -->
+  <el-dialog v-model="dialogFormVisible" :title="formTitle" width="500">
+    <el-form :model="dept">
+      <el-form-item label="部门名称" label-width="80px">
+        <el-input v-model="dept.name" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="save">确定</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
