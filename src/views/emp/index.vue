@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { queryPageApi } from '../../api/emp';
-
+import { queryAllApi as queryAllDeptApi } from '../../api/dept';
 
 //员工列表数据
 const empList = ref([
@@ -29,13 +29,14 @@ let searchEmp = ref({
     end: ''
 })
 
-//职位映射:1 班主任 2 讲师 3 学工主管 4 教研主管 5 咨询师
+//职位映射:1 班主任 2 讲师 3 学工主管 4 教研主管 5 咨询师 6 其他
 const jobMap = {
     1: "班主任",
     2: "讲师",
     3: "学工主管",
     4: "教研主管",
     5: "咨询师",
+    6: "其他",
 }
 
 //性别映射:1 男 2 女
@@ -43,6 +44,9 @@ const gender = {
     1: "男",
     2: "女",
 }
+
+//部门列表数据
+const depts = ref([]);
 
 //分页
 const currentPage = ref(1); // 当前页码
@@ -110,9 +114,18 @@ const clear = () => {
 //钩子函数
 onMounted(
     () => {
-        search();
+        search();//查询员工列表数据
+        queryAllDepts();//查询部门列表数据
     }
 )
+
+//查询所有部门数据
+const queryAllDepts = async () => {
+    const result = await queryAllDeptApi();
+    if (result.code == 1) {
+        depts.value = result.data;
+    }
+}
 
 //新增/修改表单
 const employee = ref({
@@ -289,8 +302,7 @@ const beforeAvatarUpload = (rawFile) => {
                 <el-col :span="12">
                     <el-form-item label="所属部门">
                         <el-select v-model="employee.deptId" placeholder="请选择部门" style="width: 100%;">
-                            <el-option label="研发部" value="1"></el-option>
-                            <el-option label="市场部" value="2"></el-option>
+                            <el-option v-for="d in depts" :key="d.id" :label="d.name" :value="d.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
