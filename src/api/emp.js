@@ -11,7 +11,7 @@ export const addApi = (emp) => {
 };
 
 //根据ID查询
-export const querybyIdApi = (id) => {
+export const queryInfoApi = (id) => {
     return request.get(`/emps/${id}`);
 };
 

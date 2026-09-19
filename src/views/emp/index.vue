@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { queryPageApi, addApi } from '../../api/emp';
+import { queryPageApi, addApi, queryInfoApi } from '../../api/emp';
 import { queryAllApi as queryAllDeptApi } from '../../api/dept';
 import { ElMessage } from 'element-plus';
 
@@ -64,6 +64,8 @@ const addEmp = () => {
     if (empFormRef.value) {
         empFormRef.value.resetFields();
     }
+    //用空模板兜底,确保新增时是一张干净的表单
+    employee.value = initEmployee();
 }
 
 //每页条数改变时触发(参数 val 是新的每页条数)
@@ -247,6 +249,28 @@ const rules = ref({
         { pattern: /^\d+(\.\d+)?$/, message: '薪资必须为数字', trigger: 'blur' }
     ]
 });
+
+//编辑员工信息
+const edit = async (id) => {
+    const result = await queryInfoApi(id);
+    if (result.code == 1) {
+        dialogVisible.value = true;
+        dialogTitle.value = '编辑员工';
+        //先重置表单(清掉上一次的残留数据与校验红字),再回显接口数据
+        if (empFormRef.value) {
+            empFormRef.value.resetFields();
+        }
+        employee.value = result.data;
+        //工作经历:把 begin/end 还原成日期组件使用的数组,否则会被 watch 当成"空日期"清掉
+        if (employee.value.exprList) {
+            employee.value.exprList.forEach((expr) => {
+                if (expr.begin && expr.end) {
+                    expr.exprList = [expr.begin, expr.end];
+                }
+            });
+        }
+    }
+}
 
 </script>
 
