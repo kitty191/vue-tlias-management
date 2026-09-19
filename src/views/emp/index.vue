@@ -301,6 +301,38 @@ const deleteById = async (id) => {
 
 //记录勾选员工的ID
 const selectedIds = ref([]);
+
+
+//复选框勾选发生变化时触发 
+const handleSelectionChange = (val) => {
+    selectedIds.value = val.map(item => item.id);
+}
+
+const deleteByIds = async () => {
+    ElMessageBox.confirm('确认删除选中的员工吗?', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(async () => {
+        //确认:调用删除接口
+        if (selectedIds.value.length > 0 && selectedids.value) {
+            const result = await deleteApi(selectedIds.value);
+            if (result.code == 1) {
+                ElMessage.success("删除成功");
+                search();
+            } else {
+                ElMessage.error(result.msg);
+            }
+        } else {
+            ElMessage.error("请先勾选要删除的员工");
+        }
+    }).catch(() => {
+        //取消删除
+        ElMessage.info("您已取消删除");
+    });
+
+}
+
 </script>
 
 <template>
@@ -334,13 +366,12 @@ const selectedIds = ref([]);
     <!-- 功能按钮 -->
     <div class="container">
         <el-button type="primary" @click="addEmp">+ 新增员工</el-button>
-        <el-button type="danger" @click="">- 批量删除</el-button>
+        <el-button type="danger" @click="deleteByIds">- 批量删除</el-button>
     </div>
 
     <!-- 员工列表数据表格 -->
     <div class="container">
-        <el-table :data="empList" border style="width: 100%"
-            @selection-change="(selection) => { selectedIds = selection.map(item => item.id) }">
+        <el-table :data="empList" border style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column type="index" label="序号" width="80" align="center" />
             <el-table-column prop="username" label="用户名" width="120" align="center" />
