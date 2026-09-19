@@ -1,7 +1,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { queryPageApi } from '../../api/emp';
+import { queryPageApi, addApi } from '../../api/emp';
 import { queryAllApi as queryAllDeptApi } from '../../api/dept';
+import { ElMessage } from 'element-plus';
 
 //员工列表数据
 const empList = ref([
@@ -73,14 +74,13 @@ const handleCurrentChange = (val) => {
 
 //侦听searchEmp的date属性
 watch(() => { return searchEmp.value.date }, (newVal) => {
-    if (newVal.length == 2) {
+    if (newVal && newVal.length == 2) {
         searchEmp.value.begin = newVal[0];
         searchEmp.value.end = newVal[1];
     } else {
         searchEmp.value.begin = '';
         searchEmp.value.end = '';
     }
-
 })
 
 //查询员工列表
@@ -127,8 +127,8 @@ const queryAllDepts = async () => {
     }
 }
 
-//新增/修改表单
-const employee = ref({
+//新建/修改表单的初始值
+const initEmployee = () => ({
     username: '',
     name: '',
     gender: '',
@@ -139,13 +139,21 @@ const employee = ref({
     entryDate: '',
     image: '',
     exprList: []
-})
+});
+
+//新增/修改表单
+const employee = ref(initEmployee());
+
+//关闭弹窗时清空表单数据
+const resetEmployee = () => {
+    employee.value = initEmployee();
+}
 
 
 //文件上传
 // 图片上传成功后触发
 const handleAvatarSuccess = (response) => {
-    console.log(response);
+    employee.value.image = response.data;
 }
 // 文件上传之前触发
 const beforeAvatarUpload = (rawFile) => {
@@ -157,6 +165,50 @@ const beforeAvatarUpload = (rawFile) => {
         return false
     }
     return true
+}
+
+//添加工作经历
+const addExprItem = () => {
+    employee.value.exprList.push({
+        company: '',
+        job: '',
+        begin: '',
+        end: '',
+        exprList: [] //日期范围,选择后由 watch 拆到 begin 和 end
+    });
+}
+
+//删除工作经历
+const delExprItem = (index) => {
+    employee.value.exprList.splice(index, 1);
+}
+
+//侦听工作经历中的时间变化,把日期范围拆到 begin 和 end
+watch(() => { return employee.value.exprList }, () => {
+    //exprList 不存在时直接返回(如接口回显的数据没有该字段)
+    if (!employee.value.exprList) return;
+    employee.value.exprList.forEach((expr) => {
+        if (expr.exprList && expr.exprList.length == 2) {
+            expr.begin = expr.exprList[0];
+            expr.end = expr.exprList[1];
+        } else {
+            expr.begin = '';
+            expr.end = '';
+        }
+    });
+}, { deep: true })
+
+
+//保存员工信息
+const save = async () => {
+    const result = await addApi(employee.value);
+    if (result.code == 1) {
+        ElMessage.success("操作成功");
+        dialogVisible.value = false;
+        search();
+    } else {
+        ElMessage.error(result.msg);
+    }
 }
 </script>
 
@@ -244,7 +296,7 @@ const beforeAvatarUpload = (rawFile) => {
     <!-- ...... 省略 ...... -->
 
     <!-- 新增/修改员工的对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" @close="resetEmployee">
         <el-form :model="employee" label-width="80px">
             <!-- 基本信息 -->
             <!-- 第一行 -->
@@ -335,35 +387,36 @@ const beforeAvatarUpload = (rawFile) => {
             <el-row :gutter="10">
                 <el-col :span="24">
                     <el-form-item label="工作经历">
-                        <el-button type="success" size="small" @click="">+ 添加工作经历</el-button>
+                        <el-button type="success" size="small" @click="addExprItem">+ 添加工作经历</el-button>
                     </el-form-item>
                 </el-col>
             </el-row>
 
             <!-- 第七行 ...  工作经历 -->
-            <el-row :gutter="3">
+            <el-row :gutter="3" v-for="(expr, index) in employee.exprList">
                 <el-col :span="10">
                     <el-form-item size="small" label="时间" label-width="80px">
-                        <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期"
-                            end-placeholder="结束日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD"></el-date-picker>
+                        <el-date-picker v-model="expr.exprList" type="daterange" range-separator="至"
+                            start-placeholder="开始日期" end-placeholder="结束日期" format="YYYY-MM-DD"
+                            value-format="YYYY-MM-DD"></el-date-picker>
                     </el-form-item>
                 </el-col>
 
                 <el-col :span="6">
                     <el-form-item size="small" label="公司" label-width="60px">
-                        <el-input placeholder="请输入公司名称"></el-input>
+                        <el-input v-model="expr.company" placeholder="请输入公司名称"></el-input>
                     </el-form-item>
                 </el-col>
 
                 <el-col :span="6">
                     <el-form-item size="small" label="职位" label-width="60px">
-                        <el-input placeholder="请输入职位"></el-input>
+                        <el-input v-model="expr.job" placeholder="请输入职位"></el-input>
                     </el-form-item>
                 </el-col>
 
                 <el-col :span="2">
                     <el-form-item size="small" label-width="0px">
-                        <el-button type="danger">- 删除</el-button>
+                        <el-button type="danger" @click="delExprItem(index)">- 删除</el-button>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -373,7 +426,7 @@ const beforeAvatarUpload = (rawFile) => {
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="">保存</el-button>
+                <el-button type="primary" @click="save">保存</el-button>
             </span>
         </template>
     </el-dialog>
