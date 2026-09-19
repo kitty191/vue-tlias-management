@@ -19,6 +19,6 @@ export const queryInfoApi = (id) => {
 export const updateApi = (emp) => request.put("/emps", emp);
 
 //删除
-export const deleteByIdApi = (id) => {
-    return request.delete(`/emps?id=${id}`);
+export const deleteApi = (ids) => {
+    return request.delete(`/emps?id=${ids}`);
 };

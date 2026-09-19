@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { queryPageApi, addApi, queryInfoApi } from '../../api/emp';
+import { queryPageApi, addApi, queryInfoApi, updateApi, deleteApi } from '../../api/emp';
 import { queryAllApi as queryAllDeptApi } from '../../api/dept';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 //员工列表数据
 const empList = ref([
@@ -212,7 +212,13 @@ const save = async () => {
     //表单校验,通过后再提交
     empFormRef.value.validate(async (valid) => {
         if (valid) {
-            const result = await addApi(employee.value);
+
+            let result;
+            if (employee.value.id) {//修改操作
+                result = await updateApi(employee.value);
+            } else {//新增操作
+                result = await addApi(employee.value);
+            }
             if (result.code == 1) {
                 ElMessage.success("操作成功");
                 dialogVisible.value = false;
@@ -272,6 +278,29 @@ const edit = async (id) => {
     }
 }
 
+//删除员工
+const deleteById = async (id) => {
+    ElMessageBox.confirm('确认删除该员工吗?', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(async () => {
+        //确认:调用删除接口
+        const result = await deleteApi(id);
+        if (result.code == 1) {
+            ElMessage.success("删除成功");
+            search();
+        } else {
+            ElMessage.error(result.msg);
+        }
+    }).catch(() => {
+        //取消删除
+        ElMessage.info("您已取消删除");
+    });
+}
+
+//记录勾选员工的ID
+const selectedIds = ref([]);
 </script>
 
 <template>
@@ -310,7 +339,8 @@ const edit = async (id) => {
 
     <!-- 员工列表数据表格 -->
     <div class="container">
-        <el-table :data="empList" border style="width: 100%">
+        <el-table :data="empList" border style="width: 100%"
+            @selection-change="(selection) => { selectedIds = selection.map(item => item.id) }">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column type="index" label="序号" width="80" align="center" />
             <el-table-column prop="username" label="用户名" width="120" align="center" />
@@ -338,7 +368,7 @@ const edit = async (id) => {
                     <el-button type="primary" size="small" @click="edit(scope.row.id)"><el-icon>
                             <EditPen />
                         </el-icon>编辑</el-button>
-                    <el-button type="danger" size="small" @click="delById(scope.row.id)"><el-icon>
+                    <el-button type="danger" size="small" @click="deleteById(scope.row.id)"><el-icon>
                             <Delete />
                         </el-icon>删除</el-button>
                 </template>
