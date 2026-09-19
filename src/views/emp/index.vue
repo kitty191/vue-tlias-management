@@ -8,17 +8,17 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 const empList = ref([
     {
         id: 1,
-        username: "jinyong",
-        name: "金庸",
+        username: "",
+        name: "",
         gender: 1,
-        image: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+        image: "",
         job: 2,
         salary: 8000,
-        entryDate: "2015-01-01",
+        entryDate: "",
         deptId: 2,
-        deptName: "教研部",
-        createTime: "2022-09-01T23:06:30",
-        updateTime: "2022-09-02T00:29:04"
+        deptName: "",
+        createTime: "",
+        updateTime: ""
     }
 ])
 
@@ -56,7 +56,7 @@ const background = ref(true); // 页码按钮是否显示背景色
 const total = ref(0);
 const dialogVisible = ref(false)// 控制弹窗
 const dialogTitle = ref('新增员工')
-
+const token = ref('');
 // 新增员工
 const addEmp = () => {
     dialogVisible.value = true;
@@ -121,6 +121,7 @@ onMounted(
     () => {
         search();//查询员工列表数据
         queryAllDepts();//查询部门列表数据
+        getToken();//获取token
     }
 )
 
@@ -157,7 +158,13 @@ const resetEmployee = () => {
 //表单引用(提交前校验用)
 const empFormRef = ref();
 
-
+//获取token
+const getToken = () => {
+    const loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser && loginUser.token) {
+        token.value = loginUser.token;
+    }
+}
 //文件上传
 // 图片上传成功后触发
 const handleAvatarSuccess = (response) => {
@@ -308,6 +315,7 @@ const handleSelectionChange = (val) => {
     selectedIds.value = val.map(item => item.id);
 }
 
+//批量删除员工
 const deleteByIds = async () => {
     ElMessageBox.confirm('确认删除选中的员工吗?', '提示', {
         confirmButtonText: '确认',
@@ -494,7 +502,8 @@ const deleteByIds = async () => {
                 <el-col :span="24">
                     <el-form-item label="头像">
                         <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false"
-                            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                            :on-success="handleAvatarSuccess" :headers="{ 'token': token }"
+                            :before-upload="beforeAvatarUpload">
                             <img v-if="employee.image" :src="employee.image" class="avatar" />
                             <el-icon v-else class="avatar-uploader-icon">
                                 <Plus />
